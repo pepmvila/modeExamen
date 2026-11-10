@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Temps d'examen</title>
 <style>
-:root{--accent:#2563eb;--bg:#f4f7fb;--ink:#172033}
+:root{--accent:#2563eb;--phase:#2563eb;--phase-pale:#eff6ff;--bg:#f4f7fb;--ink:#172033}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;background:#101827;color:var(--ink);overflow:hidden}
 body{display:flex;align-items:stretch;justify-content:stretch}
@@ -18,11 +18,29 @@ main{width:100vw;height:100vh;display:grid;grid-template-columns:minmax(330px,42
 .tick{stroke:#26364d;stroke-width:3;stroke-linecap:round}
 .hand{stroke:#26364d;stroke-width:5;stroke-linecap:round}
 .digital{font-size:clamp(38px,5.2vw,84px);font-weight:800;letter-spacing:.025em;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
-.remaining{font-size:clamp(16px,1.8vw,28px);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+ .remaining-label{font-size:clamp(14px,1.25vw,20px);font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em}
+.remaining{font-size:clamp(46px,6vw,104px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.035em;line-height:1.04;white-space:nowrap}
+.phase-chip{border-radius:100px;padding:10px 20px;background:var(--phase-pale);color:var(--phase);font-size:clamp(15px,1.4vw,23px);font-weight:850;text-align:center}
+.phase-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;justify-content:space-between}
+.phase-nav button{border-radius:100px;width:50px;height:50px;background:var(--phase-pale);color:var(--phase);font-size:25px;flex-shrink:0}
+.phase-nav button:disabled{opacity:.25;cursor:not-allowed}
+.phase-nav .phase-chip{flex:1}
+.message-panel{border-top:8px solid var(--phase);transition:border-color .35s}
+#message{display:block !important;overflow:auto !important;white-space:normal !important;text-align:left !important;line-height:1.32 !important}
+#message .message-content{width:100%;margin:auto 0}
+#message p{margin:0 0 .55em}
+#message h1,#message h2,#message h3{font-size:1.22em;line-height:1.17;margin:0 0 .6em;color:var(--phase)}
+#message h2{font-size:1.12em} #message h3{font-size:1.05em}
+#message strong{font-weight:850}
+#message ul{padding-left:1.4em;margin:.4em 0 .6em}
+#message .empty{color:#64748b;font-style:italic}
+#message.too-long{box-shadow:inset 0 -12px 12px -15px #b45309}
+.fit-warning{font-size:12px;color:#b45309;min-height:1em;text-align:right}
+
 .status{font-size:clamp(13px,1.15vw,18px);font-weight:700;color:#64748b;min-height:1.3em;text-align:center}
 .message-panel{padding:clamp(24px,3vw,56px);display:flex;flex-direction:column;overflow:hidden}
 .message-heading{font-size:clamp(16px,1.3vw,22px);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin-bottom:2vh}
-#message{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;text-align:justify;text-align-last:left;line-height:1.22;font-size:clamp(20px,3vw,58px);font-weight:600;overflow:hidden}
+#message{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;text-align:justify;text-align-last:left;line-height:1.22;font-size:clamp(20px,3vw,58px);font-weight:400;overflow:hidden}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:1.5vh;color:#94a3b8;font-size:clamp(10px,.8vw,13px)}
 button{border:0;border-radius:9px;padding:9px 13px;background:#e8eef8;color:#1e3a5f;font-weight:700;cursor:pointer}
 button.active{background:#dbeafe;outline:2px solid var(--accent)}
@@ -38,6 +56,7 @@ button.active{background:#dbeafe;outline:2px solid var(--accent)}
 .help{font-size:14px;color:#475569;line-height:1.45}
 .dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .primary{background:#1d4ed8;color:white}
+@media(max-width:1100px){.remaining{font-size:clamp(36px,5.2vw,75px)}.phase-nav button{width:40px;height:40px}.phase-chip{padding:8px}}
 @media(max-aspect-ratio:1/1){main{grid-template-columns:1fr;grid-template-rows:45% 1fr;gap:1vh;padding:1vh}.timer-panel{flex-direction:row;flex-wrap:wrap}.clock{height:25vh;width:25vh}.message-panel{padding:3vw}#message{font-size:clamp(18px,4vw,36px)}}
 </style>
 </head>
@@ -54,17 +73,20 @@ button.active{background:#dbeafe;outline:2px solid var(--accent)}
     <circle cx="120" cy="120" r="5.5" fill="#26364d"/>
   </svg>
   <div class="digital" id="digital">--:--:--</div>
-  <div class="remaining" id="remaining">Temps restant: --:--</div>
+  <div class="remaining-label">Temps restant</div>
+  <div class="remaining" id="remaining">--:--</div>
   <div class="status" id="status">Selecciona o espera un horari</div>
 </section>
 <section class="message-panel">
   <div class="message-heading">Informació i instruccions</div>
-  <div id="message">Benvinguts/des a l'examen.
-
-Llegiu atentament les instruccions abans de començar.
-
-Molta sort!</div>
-  <footer><span id="sync">Text local · configura Google Sheets</span><span id="slotLabel">Horari automàtic</span></footer>
+  <div class="phase-nav">
+    <button id="prevPhase" title="Missatge anterior" aria-label="Missatge anterior">‹</button>
+    <div class="phase-chip" id="phaseChip">1 · Lectura inicial</div>
+    <button id="nextPhase" title="Missatge següent" aria-label="Missatge següent">›</button>
+  </div>
+  <div id="message"><div class="message-content"><p>Connectant amb Google Sheets…</p></div></div>
+  <div class="fit-warning" id="fitWarning"></div>
+  <footer><span id="sync">Connectant amb Google Sheets…</span><span id="slotLabel">Horari automàtic</span></footer>
 </section>
 </main>
 <div id="toolbar">
@@ -80,14 +102,16 @@ Molta sort!</div>
 <div id="settings">
  <div class="dialog">
   <h2>Configuració</h2>
-  <p class="help">Enganxa l'enllaç CSV publicat del teu Google Sheet. La pàgina el consultarà periòdicament. Per a control remot, canvia la cel·la de l'horari al full.</p>
+  <p class="help">El web llegeix automàticament els missatges de B1, C1 i D1 del full de Google Sheets publicat en CSV. Canvia el text al full per actualitzar la projecció.</p>
   <label for="sheetUrl">URL CSV de Google Sheets</label>
   <input id="sheetUrl" readonly>
-  <label for="localMessage">Text alternatiu (si el full no està configurat)</label>
+  <label for="localMessage">Missatge alternatiu del bloc actual (només fins a la propera sincronització)</label>
   <textarea id="localMessage"></textarea>
   <div class="help">
-   <b>Format del full:</b> A1 = <code>missatge</code>, B1 = text que es mostrarà; A2 = <code>horari</code>, B2 = una de les opcions: <code>08:00-09:00</code>, <code>09:00-10:00</code>, <code>10:00-11:00</code>, <code>11:30-12:30</code>, <code>12:30-13:30</code> o <code>13:30-14:30</code>. També pots posar <code>auto</code> a B2 perquè detecti l'horari segons l'hora real.
-   <br><br>Al full: Fitxer → Comparteix → Publica al web → selecciona el full i format CSV → Publica. Copia l'enllaç publicat aquí. Qualsevol persona amb l'enllaç podrà llegir el text publicat.
+   <b>Fila 1:</b> B1 = missatge inicial (0–5 minuts); C1 = missatge principal (5–50 minuts); D1 = missatge final (a partir del minut 50). A1 pot contenir un títol.
+   <br><br><b>Format:</b> <code>**negreta**</code> i <code># Títol</code> al principi de línia; també <code>## Subtítol</code>, <code>*cursiva*</code> i llistes amb <code>- </code>. Usa Alt+Retorn dins una cel·la per fer salts de línia.
+   <br><br><b>Horari opcional:</b> A2 = <code>horari</code> i B2 = <code>auto</code>, o una franja com <code>08:00-09:00</code>. Amb <code>auto</code> s'utilitza l'horari habitual. El canvi automàtic es produeix als minuts 5 i 50 des de l'inici de la franja seleccionada.
+   <br><br>Per publicar: Google Sheets → Fitxer → Comparteix → Publica al web → selecciona el full → CSV. El full publicat pot ser accessible per altres persones: no hi posis dades sensibles. La publicació pot tenir retard en propagar els canvis.
   </div>
   <div class="dialog-actions"><button id="closeSettings">Tancar</button><button class="primary" id="saveSettings">Desar</button></div>
  </div>
@@ -96,7 +120,13 @@ Molta sort!</div>
 const slots=[["08:00","09:00"],["09:00","10:00"],["10:00","11:00"],["11:30","12:30"],["12:30","13:30"],["13:30","14:30"]];
 const $=id=>document.getElementById(id);
 const DEFAULT_SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSfYiyxkncgw25IXXoJhF95e_3ew4eisumWmIAVdlSUudwD64JE4FclduCoK77xpngZcNYVAmUmL5-X/pub?output=csv";
-let selectedSlot=null, sheetTimer=null, currentMessage="", localSlotOverride=false;
+let selectedSlot=null, sheetTimer=null, localSlotOverride=false;
+const phaseInfo=[
+ {label:"1 · Lectura inicial",color:"#1d4ed8",pale:"#dbeafe",fallback:"# Llegeix atentament l’examen\n\n**Primers cinc minuts:** llegeix els enunciats abans de començar."},
+ {label:"2 · Durant l’examen",color:"#15803d",pale:"#dcfce7",fallback:"# Instruccions generals\n\n**Treballa en silenci.**\n\nEscriu els càlculs i revisa les respostes."},
+ {label:"3 · Tram final",color:"#c2410c",pale:"#ffedd5",fallback:"# Últims minuts\n\n**Revisa les respostes.**\n\nComprova que no t’has deixat cap apartat."}
+];
+let sheetMessages=phaseInfo.map(p=>p.fallback), shownPhase=-1, manualPhase=null, lastAutoPhase=-1, currentMessage="";
 
 function buildClock(){
  const ticks=$("ticks"), nums=$("numbers");
@@ -123,16 +153,58 @@ function activeSlot(now){
 function setAccent(color){
  document.documentElement.style.setProperty("--accent",color);
 }
-function fitMessage(){
- const el=$("message"), panel=el.parentElement;
- let size=Math.min(window.innerWidth*.034,window.innerHeight*.075,64);
- el.style.fontSize=size+"px";
- while((el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2) && size>12){size-=1;el.style.fontSize=size+"px"}
- while(size<Math.min(window.innerWidth*.034,window.innerHeight*.075,64)-1){
-  const next=size+1;el.style.fontSize=next+"px";
-  if(el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2){el.style.fontSize=size+"px";break}
-  size=next;
+function escapeHTML(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
+function inlineMarkdown(t){
+ return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>");
+}
+function markdown(text){
+ const lines=String(text||"").replace(/\r\n?/g,"\n").split("\n");
+ let html="",inList=false;
+ for(const raw of lines){
+  const line=raw.trim();
+  if(/^[-•]\s+/.test(line)){
+    if(!inList){html+="<ul>";inList=true}
+    html+="<li>"+inlineMarkdown(line.replace(/^[-•]\s+/,""))+"</li>";continue;
+  }
+  if(inList){html+="</ul>";inList=false}
+  if(!line){html+='<div style="height:.34em"></div>';continue}
+  const heading=line.match(/^(#{1,3})\s+(.+)$/);
+  if(heading){const level=heading[1].length;html+=`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`}
+  else html+="<p>"+inlineMarkdown(line)+"</p>";
  }
+ if(inList)html+="</ul>";
+ return html||'<p class="empty">No hi ha cap missatge en aquesta casella.</p>';
+}
+function fitMessage(){
+ const el=$("message"), content=el.querySelector(".message-content");if(!content)return;
+ const max=Math.min(window.innerWidth*.037,window.innerHeight*.075,66),min=23;
+ let lo=min,hi=Math.max(min,max),size=min;
+ const fits=sz=>{el.style.fontSize=sz+"px";return content.scrollHeight<=el.clientHeight-5&&content.scrollWidth<=el.clientWidth-3};
+ if(fits(hi))size=hi;
+ else {for(let k=0;k<14;k++){const mid=(lo+hi)/2;if(fits(mid)){size=mid;lo=mid}else hi=mid}}
+ el.style.fontSize=size+"px";
+ const over=!fits(size);
+ el.classList.toggle("too-long",over);
+ $("fitWarning").textContent=over?"Missatge llarg: es pot desplaçar cap avall":"";
+}
+function showPhase(phase){
+ phase=Math.min(2,Math.max(0,phase));
+ if(shownPhase===phase&&currentMessage===sheetMessages[phase])return;
+ shownPhase=phase;currentMessage=sheetMessages[phase];
+ $("phaseChip").textContent=phaseInfo[phase].label;
+ document.documentElement.style.setProperty("--phase",phaseInfo[phase].color);
+ document.documentElement.style.setProperty("--phase-pale",phaseInfo[phase].pale);
+ $("prevPhase").disabled=phase===0;$("nextPhase").disabled=phase===2;
+ $("message").innerHTML='<div class="message-content">'+markdown(currentMessage)+'</div>';
+ fitMessage();
+}
+function advancePhase(delta){manualPhase=Math.max(0,Math.min(2,shownPhase+delta));showPhase(manualPhase)}
+function refreshAutomaticPhase(elapsed){
+ if(elapsed===null)return;
+ const autoPhase=elapsed<5?0:elapsed<50?1:2;
+ // A cada canvi automàtic de tram, recuperem el control automàtic.
+ if(lastAutoPhase!==autoPhase){manualPhase=null;lastAutoPhase=autoPhase}
+ showPhase(manualPhase===null?autoPhase:manualPhase);
 }
 function render(){
  const now=new Date(), hh=now.getHours(), mm=now.getMinutes(), ss=now.getSeconds();
@@ -141,16 +213,17 @@ function render(){
  $("hourHand").setAttribute("transform",`rotate(${hourAngle} 120 120)`);
  $("minuteHand").setAttribute("transform",`rotate(${minuteAngle} 120 120)`);
  let idx=selectedSlot===null?activeSlot(now):selectedSlot;
- if(idx<0){$("remaining").textContent="Temps restant: --:--";$("status").textContent="Fora de l'horari d'examen";$("slotLabel").textContent="Sense examen actiu";setAccent("#2563eb");return}
- const [start,end]=slots[idx], endMin=parseTime(end), left=Math.max(0,Math.ceil((endMin-minute)*60));
- const mins=Math.ceil(left/60), sec=left%60;
- $("remaining").textContent=`Temps restant: ${String(mins).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+ if(idx<0){$("remaining").textContent="--:--";$("status").textContent="Fora de l'horari d'examen";$("slotLabel").textContent="Sense examen actiu";setAccent("#2563eb");return}
+ const [start,end]=slots[idx], startMin=parseTime(start),endMin=parseTime(end),remainingSeconds=Math.max(0,Math.ceil((endMin-minute)*60));
+ const mins=Math.floor(remainingSeconds/60),sec=remainingSeconds%60;
+ $("remaining").textContent=`${String(mins).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
  $("slotLabel").textContent=`Horari: ${start} – ${end}`;
- if(left<=300){setAccent("#dc2626");$("status").textContent="Últims cinc minuts"}
- else if(left<=600){setAccent("#f97316");$("status").textContent="Queden deu minuts"}
- else if(left<=900){setAccent("#eab308");$("status").textContent="Queden quinze minuts"}
- else if(left<=1800){setAccent("#16a34a");$("status").textContent="Queden trenta minuts"}
+ if(remainingSeconds<=300){setAccent("#dc2626");$("status").textContent="Últims cinc minuts"}
+ else if(remainingSeconds<=600){setAccent("#f97316");$("status").textContent="Queden deu minuts"}
+ else if(remainingSeconds<=900){setAccent("#eab308");$("status").textContent="Queden quinze minuts"}
+ else if(remainingSeconds<=1800){setAccent("#16a34a");$("status").textContent="Queden trenta minuts"}
  else{setAccent("#2563eb");$("status").textContent="Temps d'examen"}
+ refreshAutomaticPhase(Math.max(0,minute-startMin));
 }
 function parseCSV(text){
  const rows=[];let row=[],cell="",quoted=false;
@@ -165,31 +238,39 @@ function parseCSV(text){
  return rows;
 }
 async function fetchSheet(){
- const url=DEFAULT_SHEET_URL;
  try{
-  const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
+  const res=await fetch(DEFAULT_SHEET_URL,{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
   const rows=parseCSV(await res.text());
-  const values={};rows.forEach(r=>{if(r.length>=2)values[r[0].trim().toLowerCase()]=r.slice(1).join(",").trim()});
-  if(values.missatge!==undefined&&values.missatge!==currentMessage){currentMessage=values.missatge;$("message").textContent=currentMessage;fitMessage()}
-  if(values.horari){const v=values.horari.toLowerCase().replace(/\s/g,"");
-   if(v==="auto"){selectedSlot=null}
-   else {const i=slots.findIndex(([a,b])=>(a+"-"+b).toLowerCase()===v);if(i>=0)selectedSlot=i}
+  if(rows.length){
+    const first=rows[0];
+    // B1, C1, D1: les columnes del primer registre CSV.
+    const next=[1,2,3].map((col,i)=>first[col]!==undefined?first[col]:sheetMessages[i]);
+    sheetMessages=next;
   }
+  const values={};rows.slice(1).forEach(r=>{if(r.length>=2)values[(r[0]||"").trim().toLowerCase()]=(r[1]||"").trim()});
+  if(values.horari&&!localSlotOverride){
+    const v=values.horari.toLowerCase().replace(/\s/g,"");
+    if(v==="auto")selectedSlot=null;
+    else {const i=slots.findIndex(([a,b])=>(a+"-"+b).toLowerCase()===v);if(i>=0)selectedSlot=i}
+  }
+  showPhase(shownPhase<0?0:shownPhase);
   $("sync").textContent="Google Sheets · actualitzat "+new Date().toLocaleTimeString("ca-ES");
- }catch(e){$("sync").textContent="No s'ha pogut llegir el full · es manté l'últim text"}
+ }catch(e){$("sync").textContent="Sense connexió · es manté l’últim missatge"}
 }
-$("slotSelect").onchange=e=>{localSlotOverride=e.target.value!=="auto";selectedSlot=localSlotOverride?Number(e.target.value):null;render()};
+$("slotSelect").onchange=e=>{localSlotOverride=e.target.value!=="auto";selectedSlot=localSlotOverride?Number(e.target.value):null;lastAutoPhase=-1;render()};
+$("prevPhase").onclick=()=>advancePhase(-1);
+$("nextPhase").onclick=()=>advancePhase(1);
 $("settingsBtn").onclick=()=>{$("sheetUrl").value=DEFAULT_SHEET_URL;$("localMessage").value=currentMessage||$("message").textContent;$("settings").classList.add("open")};
 $("closeSettings").onclick=()=>$("settings").classList.remove("open");
 $("saveSettings").onclick=()=>{
  const url=DEFAULT_SHEET_URL, msg=$("localMessage").value;
- currentMessage=msg;$("message").textContent=msg;fitMessage();
+ sheetMessages[shownPhase<0?0:shownPhase]=msg;showPhase(shownPhase<0?0:shownPhase);
  $("settings").classList.remove("open");fetchSheet();
  if(sheetTimer)clearInterval(sheetTimer);sheetTimer=setInterval(fetchSheet,10000);
 };
 $("fullBtn").onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
 window.addEventListener("resize",fitMessage);
-buildClock();render();setInterval(render,250);fitMessage();
+buildClock();showPhase(0);render();setInterval(render,250);fitMessage();
 sheetTimer=setInterval(fetchSheet,10000);fetchSheet();
 </script>
 </body>
