@@ -12,13 +12,13 @@ body{display:flex;align-items:stretch;justify-content:stretch}
 main{width:100vw;height:100vh;display:grid;grid-template-columns:minmax(330px,42%) 1fr;gap:1.2vw;padding:1.2vw;background:var(--bg)}
 .timer-panel,.message-panel{border-radius:22px;background:#fff;box-shadow:0 8px 32px #10204016;min-width:0;min-height:0}
 .timer-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2vh 2vw;gap:1.5vh}
-.kicker{font-size:clamp(13px,1.2vw,20px);font-weight:700;letter-spacing:.14em;color:#64748b;text-transform:uppercase}
+.kicker{color:var(--accent);font-size:clamp(13px,1.2vw,20px);font-weight:700;letter-spacing:.14em;color:#64748b;text-transform:uppercase}
 .clock{width:min(36vw,65vh,520px);height:min(36vw,65vh,520px);max-width:100%;overflow:visible}
 .clock-face{fill:#fff;stroke:var(--accent);stroke-width:7}
-.tick{stroke:#26364d;stroke-width:3;stroke-linecap:round}
-.hand{stroke:#26364d;stroke-width:5;stroke-linecap:round}
+.tick{stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+.hand{stroke:var(--accent);stroke-width:5;stroke-linecap:round}
 .digital{font-size:clamp(38px,5.2vw,84px);font-weight:800;letter-spacing:.025em;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
- .remaining-label{font-size:clamp(14px,1.25vw,20px);font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em}
+ .remaining-label{font-size:clamp(14px,1.25vw,20px);font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
 .remaining{font-size:clamp(46px,6vw,104px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.035em;line-height:1.04;white-space:nowrap}
 .phase-chip{border-radius:100px;padding:10px 20px;background:var(--phase-pale);color:var(--phase);font-size:clamp(15px,1.4vw,23px);font-weight:850;text-align:center}
 .phase-nav{display:flex;align-items:center;gap:12px;margin-bottom:18px;justify-content:space-between}
@@ -31,16 +31,23 @@ main{width:100vw;height:100vh;display:grid;grid-template-columns:minmax(330px,42
 #message p{margin:0 0 .55em}
 #message h1,#message h2,#message h3{font-size:1.22em;line-height:1.17;margin:0 0 .6em;color:var(--phase)}
 #message h2{font-size:1.12em} #message h3{font-size:1.05em}
-#message strong{font-weight:850}
+#message strong,#message b{font-weight:900 !important;color:#111827}
 #message ul{padding-left:1.4em;margin:.4em 0 .6em}
 #message .empty{color:#64748b;font-style:italic}
 #message.too-long{box-shadow:inset 0 -12px 12px -15px #b45309}
 .fit-warning{font-size:12px;color:#b45309;min-height:1em;text-align:right}
+.message-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;min-height:45px}
+.font-controls{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-shrink:0}
+.font-controls button{width:44px;height:42px;padding:0;border-radius:12px;background:var(--phase-pale);color:var(--phase);font-size:19px;font-weight:900;line-height:1;transition:background .2s,transform .15s}
+.font-controls button:hover{filter:brightness(.95)}
+.font-controls button:active{transform:scale(.95)}
+.font-controls button:disabled{opacity:.3;cursor:not-allowed}
+.font-controls button:focus-visible{outline:3px solid var(--phase);outline-offset:2px}
 
 .status{font-size:clamp(13px,1.15vw,18px);font-weight:700;color:#64748b;min-height:1.3em;text-align:center}
 .message-panel{padding:clamp(24px,3vw,56px);display:flex;flex-direction:column;overflow:hidden}
-.message-heading{font-size:clamp(16px,1.3vw,22px);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin-bottom:2vh}
-#message{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;text-align:justify;text-align-last:left;line-height:1.22;font-size:clamp(20px,3vw,58px);font-weight:400;overflow:hidden}
+.message-heading{color:var(--accent);font-size:clamp(16px,1.3vw,22px);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin-bottom:2vh}
+#message{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;text-align:justify;text-align-last:left;line-height:1.22;font-size:clamp(20px,3vw,58px);overflow:hidden}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:1.5vh;color:#94a3b8;font-size:clamp(10px,.8vw,13px)}
 button{border:0;border-radius:9px;padding:9px 13px;background:#e8eef8;color:#1e3a5f;font-weight:700;cursor:pointer}
 button.active{background:#dbeafe;outline:2px solid var(--accent)}
@@ -67,10 +74,10 @@ button.active{background:#dbeafe;outline:2px solid var(--accent)}
   <svg class="clock" viewBox="0 0 240 240" aria-label="Rellotge analògic">
     <circle class="clock-face" cx="120" cy="120" r="109"/>
     <g id="ticks"></g>
-    <g id="numbers" fill="#26364d" font-size="16" font-weight="700" text-anchor="middle" dominant-baseline="middle"></g>
+    <g id="numbers" fill="var(--accent)" font-size="16" font-weight="700" text-anchor="middle" dominant-baseline="middle"></g>
     <line id="hourHand" class="hand" x1="120" y1="120" x2="120" y2="68"/>
     <line id="minuteHand" class="hand" x1="120" y1="120" x2="120" y2="37" style="stroke-width:3.5"/>
-    <circle cx="120" cy="120" r="5.5" fill="#26364d"/>
+    <circle cx="120" cy="120" r="5.5" fill="var(--accent)"/>
   </svg>
   <div class="digital" id="digital">--:--:--</div>
   <div class="remaining-label">Temps restant</div>
@@ -85,7 +92,13 @@ button.active{background:#dbeafe;outline:2px solid var(--accent)}
     <button id="nextPhase" title="Missatge següent" aria-label="Missatge següent">›</button>
   </div>
   <div id="message"><div class="message-content"><p>Connectant amb Google Sheets…</p></div></div>
-  <div class="fit-warning" id="fitWarning"></div>
+  <div class="message-bottom">
+    <div class="fit-warning" id="fitWarning" aria-live="polite"></div>
+    <div class="font-controls" aria-label="Mida de la lletra de les instruccions">
+      <button id="fontSmaller" type="button" title="Reduir la lletra" aria-label="Reduir la lletra">A−</button>
+      <button id="fontBigger" type="button" title="Augmentar la lletra" aria-label="Augmentar la lletra">A+</button>
+    </div>
+  </div>
   <footer><span id="sync">Connectant amb Google Sheets…</span><span id="slotLabel">Horari automàtic</span></footer>
 </section>
 </main>
@@ -150,8 +163,35 @@ function activeSlot(now){
  const mins=now.getHours()*60+now.getMinutes();
  return slots.findIndex(([a,b])=>mins>=parseTime(a)&&mins<parseTime(b));
 }
+// Transició contínua en funció dels minuts transcorreguts des de l'inici de l'examen.
+// Blau fosc a l'inici, verd des del minut 10, i vermell intens als últims 3 minuts.
+const colorStops=[
+ [0,"#1e3a8a"],   // Blau fosc
+ [10,"#15803d"],  // Verd
+ [40,"#15803d"],  // Es manté verd la major part de la sessió
+ [48,"#eab308"],  // Groc
+ [54,"#f97316"],  // Taronja
+ [57,"#dc2626"],  // Vermell fort (últims 3 minuts)
+ [60,"#dc2626"]
+];
+function mixHex(a,b,t){
+ const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+ const aa=rgb(a),bb=rgb(b);
+ return '#'+aa.map((v,i)=>Math.round(v+(bb[i]-v)*t).toString(16).padStart(2,'0')).join('');
+}
+function examColor(elapsed){
+ const t=Math.max(0,Math.min(60,elapsed));
+ for(let i=1;i<colorStops.length;i++){
+  const [end,cb]=colorStops[i];
+  if(t<=end){const [start,ca]=colorStops[i-1];return mixHex(ca,cb,(t-start)/(end-start));}
+ }
+ return colorStops[colorStops.length-1][1];
+}
 function setAccent(color){
- document.documentElement.style.setProperty("--accent",color);
+ const root=document.documentElement;
+ root.style.setProperty("--accent",color);
+ root.style.setProperty("--phase",color);
+ root.style.setProperty("--phase-pale",mixHex(color,"#ffffff",.89));
 }
 function escapeHTML(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
 function inlineMarkdown(t){
@@ -175,6 +215,11 @@ function markdown(text){
  if(inList)html+="</ul>";
  return html||'<p class="empty">No hi ha cap missatge en aquesta casella.</p>';
 }
+let fontScale=1;
+function changeFontScale(delta){
+ fontScale=Math.round(Math.min(1.8,Math.max(.6,fontScale+delta))*10)/10;
+ fitMessage();
+}
 function fitMessage(){
  const el=$("message"), content=el.querySelector(".message-content");if(!content)return;
  const max=Math.min(window.innerWidth*.037,window.innerHeight*.075,66),min=23;
@@ -182,8 +227,12 @@ function fitMessage(){
  const fits=sz=>{el.style.fontSize=sz+"px";return content.scrollHeight<=el.clientHeight-5&&content.scrollWidth<=el.clientWidth-3};
  if(fits(hi))size=hi;
  else {for(let k=0;k<14;k++){const mid=(lo+hi)/2;if(fits(mid)){size=mid;lo=mid}else hi=mid}}
- el.style.fontSize=size+"px";
- const over=!fits(size);
+ // Partim de l'ajust automàtic, però respectem la mida triada manualment.
+ const chosenSize=Math.round(size*fontScale*10)/10;
+ el.style.fontSize=chosenSize+"px";
+ const over=content.scrollHeight>el.clientHeight+2||content.scrollWidth>el.clientWidth+2;
+ $("fontSmaller").disabled=fontScale<=.6;
+ $("fontBigger").disabled=fontScale>=1.8;
  el.classList.toggle("too-long",over);
  $("fitWarning").textContent=over?"Missatge llarg: es pot desplaçar cap avall":"";
 }
@@ -192,8 +241,6 @@ function showPhase(phase){
  if(shownPhase===phase&&currentMessage===sheetMessages[phase])return;
  shownPhase=phase;currentMessage=sheetMessages[phase];
  $("phaseChip").textContent=phaseInfo[phase].label;
- document.documentElement.style.setProperty("--phase",phaseInfo[phase].color);
- document.documentElement.style.setProperty("--phase-pale",phaseInfo[phase].pale);
  $("prevPhase").disabled=phase===0;$("nextPhase").disabled=phase===2;
  $("message").innerHTML='<div class="message-content">'+markdown(currentMessage)+'</div>';
  fitMessage();
@@ -213,17 +260,21 @@ function render(){
  $("hourHand").setAttribute("transform",`rotate(${hourAngle} 120 120)`);
  $("minuteHand").setAttribute("transform",`rotate(${minuteAngle} 120 120)`);
  let idx=selectedSlot===null?activeSlot(now):selectedSlot;
- if(idx<0){$("remaining").textContent="--:--";$("status").textContent="Fora de l'horari d'examen";$("slotLabel").textContent="Sense examen actiu";setAccent("#2563eb");return}
+ if(idx<0){$("remaining").textContent="--:--";$("status").textContent="Fora de l'horari d'examen";$("slotLabel").textContent="Sense examen actiu";setAccent("#1e3a8a");return}
  const [start,end]=slots[idx], startMin=parseTime(start),endMin=parseTime(end),remainingSeconds=Math.max(0,Math.ceil((endMin-minute)*60));
  const mins=Math.floor(remainingSeconds/60),sec=remainingSeconds%60;
  $("remaining").textContent=`${String(mins).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
  $("slotLabel").textContent=`Horari: ${start} – ${end}`;
- if(remainingSeconds<=300){setAccent("#dc2626");$("status").textContent="Últims cinc minuts"}
- else if(remainingSeconds<=600){setAccent("#f97316");$("status").textContent="Queden deu minuts"}
- else if(remainingSeconds<=900){setAccent("#eab308");$("status").textContent="Queden quinze minuts"}
- else if(remainingSeconds<=1800){setAccent("#16a34a");$("status").textContent="Queden trenta minuts"}
- else{setAccent("#2563eb");$("status").textContent="Temps d'examen"}
- refreshAutomaticPhase(Math.max(0,minute-startMin));
+ const elapsed=Math.max(0,minute-startMin);
+ // El color segueix el temps real, independentment del missatge seleccionat manualment.
+ setAccent(examColor(elapsed));
+ if(remainingSeconds<=180){$("status").textContent="Últims tres minuts"}
+ else if(remainingSeconds<=300){$("status").textContent="Últims cinc minuts"}
+ else if(remainingSeconds<=600){$("status").textContent="Queden deu minuts"}
+ else if(remainingSeconds<=900){$("status").textContent="Queden quinze minuts"}
+ else if(remainingSeconds<=1800){$("status").textContent="Queden trenta minuts"}
+ else{$("status").textContent="Temps d'examen"}
+ refreshAutomaticPhase(elapsed);
 }
 function parseCSV(text){
  const rows=[];let row=[],cell="",quoted=false;
@@ -260,6 +311,8 @@ async function fetchSheet(){
 $("slotSelect").onchange=e=>{localSlotOverride=e.target.value!=="auto";selectedSlot=localSlotOverride?Number(e.target.value):null;lastAutoPhase=-1;render()};
 $("prevPhase").onclick=()=>advancePhase(-1);
 $("nextPhase").onclick=()=>advancePhase(1);
+$("fontSmaller").onclick=()=>changeFontScale(-.1);
+$("fontBigger").onclick=()=>changeFontScale(.1);
 $("settingsBtn").onclick=()=>{$("sheetUrl").value=DEFAULT_SHEET_URL;$("localMessage").value=currentMessage||$("message").textContent;$("settings").classList.add("open")};
 $("closeSettings").onclick=()=>$("settings").classList.remove("open");
 $("saveSettings").onclick=()=>{
@@ -270,7 +323,7 @@ $("saveSettings").onclick=()=>{
 };
 $("fullBtn").onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
 window.addEventListener("resize",fitMessage);
-buildClock();showPhase(0);render();setInterval(render,250);fitMessage();
+buildClock();showPhase(0);render();setInterval(render,1000);fitMessage();
 sheetTimer=setInterval(fetchSheet,10000);fetchSheet();
 </script>
 </body>
