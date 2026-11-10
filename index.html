@@ -82,7 +82,7 @@ Molta sort!</div>
   <h2>Configuració</h2>
   <p class="help">Enganxa l'enllaç CSV publicat del teu Google Sheet. La pàgina el consultarà periòdicament. Per a control remot, canvia la cel·la de l'horari al full.</p>
   <label for="sheetUrl">URL CSV de Google Sheets</label>
-  <input id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+  <input id="sheetUrl" readonly>
   <label for="localMessage">Text alternatiu (si el full no està configurat)</label>
   <textarea id="localMessage"></textarea>
   <div class="help">
@@ -95,6 +95,7 @@ Molta sort!</div>
 <script>
 const slots=[["08:00","09:00"],["09:00","10:00"],["10:00","11:00"],["11:30","12:30"],["12:30","13:30"],["13:30","14:30"]];
 const $=id=>document.getElementById(id);
+const DEFAULT_SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSfYiyxkncgw25IXXoJhF95e_3ew4eisumWmIAVdlSUudwD64JE4FclduCoK77xpngZcNYVAmUmL5-X/pub?output=csv";
 let selectedSlot=null, sheetTimer=null, currentMessage="", localSlotOverride=false;
 
 function buildClock(){
@@ -164,7 +165,7 @@ function parseCSV(text){
  return rows;
 }
 async function fetchSheet(){
- const url=localStorage.getItem("examSheetUrl");if(!url){$("sync").textContent="Text local · configura Google Sheets";return}
+ const url=DEFAULT_SHEET_URL;
  try{
   const res=await fetch(url,{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
   const rows=parseCSV(await res.text());
@@ -178,11 +179,11 @@ async function fetchSheet(){
  }catch(e){$("sync").textContent="No s'ha pogut llegir el full · es manté l'últim text"}
 }
 $("slotSelect").onchange=e=>{localSlotOverride=e.target.value!=="auto";selectedSlot=localSlotOverride?Number(e.target.value):null;render()};
-$("settingsBtn").onclick=()=>{$("sheetUrl").value=localStorage.getItem("examSheetUrl")||"";$("localMessage").value=currentMessage||$("message").textContent;$("settings").classList.add("open")};
+$("settingsBtn").onclick=()=>{$("sheetUrl").value=DEFAULT_SHEET_URL;$("localMessage").value=currentMessage||$("message").textContent;$("settings").classList.add("open")};
 $("closeSettings").onclick=()=>$("settings").classList.remove("open");
 $("saveSettings").onclick=()=>{
- const url=$("sheetUrl").value.trim(), msg=$("localMessage").value;
- localStorage.setItem("examSheetUrl",url);currentMessage=msg;$("message").textContent=msg;fitMessage();
+ const url=DEFAULT_SHEET_URL, msg=$("localMessage").value;
+ currentMessage=msg;$("message").textContent=msg;fitMessage();
  $("settings").classList.remove("open");fetchSheet();
  if(sheetTimer)clearInterval(sheetTimer);sheetTimer=setInterval(fetchSheet,10000);
 };
